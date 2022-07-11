@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>pl.grabojan.certsentryrx</groupId>
 	<artifactId>certsentry-util</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<name>certsentryrx-util</name>
 	<description>Certsentry Reactive Utils</description>
 	<properties>

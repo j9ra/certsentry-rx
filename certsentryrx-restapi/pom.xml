@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>pl.grabojan.certsentryrx</groupId>
 	<artifactId>certsentry-restapi</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<name>certsentryrx-restapi</name>
 	<description>Certsentry Reactive RestAPI</description>
 	<properties>
@@ -59,14 +59,12 @@
 		<dependency>
 			<groupId>pl.grabojan.certsentryrx</groupId>
 			<artifactId>certsentry-data</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.1.0</version>
 		</dependency>
-		
-		
-			<dependency>
+		<dependency>
 			<groupId>pl.grabojan.certsentryrx</groupId>
 			<artifactId>certsentry-util</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.1.0</version>
 		</dependency>
 		
 	</dependencies>
