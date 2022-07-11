@@ -15,6 +15,7 @@
 	<description>Certsentry Reactive Utils</description>
 	<properties>
 		<java.version>11</java.version>
+		<spring-boot.repackage.skip>true</spring-boot.repackage.skip>
 	</properties>
 	<dependencies>
 		<dependency>
