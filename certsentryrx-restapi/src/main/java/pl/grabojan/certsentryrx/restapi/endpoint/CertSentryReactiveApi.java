@@ -24,6 +24,7 @@ import pl.grabojan.certsentryrx.restapi.pkix.RevocationDataParams;
 import pl.grabojan.certsentryrx.util.cert.PkixURIResolver;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -52,9 +53,6 @@ public class CertSentryReactiveApi {
 	    			.body(profiles, ProfileResponse.class);
 	}
 	    
-
-
-
 	public Mono<ServerResponse> getProfile(ServerRequest request) {
 
 		String profileName = request.pathVariable("name");
@@ -87,7 +85,8 @@ public class CertSentryReactiveApi {
 	    								(c, ca) -> new PathParams(c, ca))
 	    		)
 	    		.flatMap(pathParams ->  
-	    			Mono.just(certPathHandler.buildPath(pathParams.getTargetCert(), pathParams.getCaCerts()))
+	    			Mono.fromCallable(() -> certPathHandler.buildPath(pathParams.getTargetCert(), pathParams.getCaCerts()))
+	    				.subscribeOn(Schedulers.boundedElastic())
 	    		)
 	    		.flatMap(certPath -> { 
 	    			X509Certificate uc = certPathHandler.mapUserCertificate(certPath);
@@ -101,10 +100,12 @@ public class CertSentryReactiveApi {
     			    	    								  	.map(tuple -> tuple.getT1().addCrlData(certPathHandler.mapCrl(tuple.getT2())))
     			    	    				: Mono.error(pkixURIResolver.failUnresolved()) ;
 	    		})
-	    		.flatMap(certPath -> {
-	    			certPathHandler.validatePath(certPath.getAnchor(), certPath.getCertPath(), certPath.getCrls(), certPath.getOcspData()); 
-	    			return Mono.just(certPath); 
-	    		})
+	    		.flatMap(certPath -> 
+	    			 Mono.fromCallable(() -> certPathHandler.validatePath(certPath.getAnchor(), certPath.getCertPath(),
+	    					 certPath.getCrls(), certPath.getOcspData()))
+	    			 			.map( pubKey -> { return certPath; })
+	    			 			.subscribeOn(Schedulers.boundedElastic())
+	    		)
 	    		.flatMap( c -> {
 	    			String ref = UUID.randomUUID().toString();
 	    			return request.principal()
