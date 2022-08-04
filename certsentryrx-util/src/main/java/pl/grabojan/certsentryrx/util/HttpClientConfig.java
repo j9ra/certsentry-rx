@@ -1,10 +1,12 @@
 package pl.grabojan.certsentryrx.util;
 
 import java.time.Duration;
+import java.util.function.Function;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.http.client.reactive.ReactorResourceFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import io.netty.channel.ChannelOption;
@@ -30,8 +32,27 @@ public class HttpClientConfig {
 	}
 	
 	@Bean
+	public ReactorResourceFactory resourceFactory() {
+	    ReactorResourceFactory factory = new ReactorResourceFactory();
+	    factory.setUseGlobalResources(false); 
+	    return factory;
+	}
+	
+	@Bean
 	public ReactorClientHttpConnector reactorClientHttpConnector() {
-	    return new ReactorClientHttpConnector(httpClient());
+//	    return new ReactorClientHttpConnector(httpClient());
+		
+		 Function<HttpClient, HttpClient> mapper = client -> {
+		        // Further customizations...
+			 client.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
+		        .responseTimeout(Duration.ofSeconds(10))
+		        .doOnConnected(conn -> conn
+		                .addHandlerLast(new ReadTimeoutHandler(10))
+		                .addHandlerLast(new WriteTimeoutHandler(10)));
+			 return client;
+		    };
+		
+		return new ReactorClientHttpConnector(resourceFactory(), mapper);
 	}
 	
 	
