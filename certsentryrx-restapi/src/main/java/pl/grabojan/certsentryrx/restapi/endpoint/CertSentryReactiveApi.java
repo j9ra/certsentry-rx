@@ -70,7 +70,7 @@ public class CertSentryReactiveApi {
 	    	
 	    Mono<ValidationRequest> validationRequest = request.bodyToMono(ValidationRequest.class).doOnNext(this::validate);
 	    Mono<X509Certificate> userCertToValidate = validationRequest
-		    		.map(req -> certPathHandler.mapCertificate(req.getCert()))
+		    		.flatMap(req -> Mono.just(certPathHandler.mapCertificate(req.getCert())))
 		    		.share();
 	    
 	    return userCertToValidate
