@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.client.reactive.ReactorResourceFactory;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -32,6 +33,13 @@ public class HttpClientConfig {
 	}
 	
 	@Bean
+	@Profile(value = "default")
+	public ReactorClientHttpConnector reactorClientHttpConnector1() {
+		return new ReactorClientHttpConnector(httpClient());
+	}
+	
+	@Bean
+	@Profile(value = "httpclientthreads")
 	public ReactorResourceFactory resourceFactory() {
 	    ReactorResourceFactory factory = new ReactorResourceFactory();
 	    factory.setUseGlobalResources(false); 
@@ -39,9 +47,8 @@ public class HttpClientConfig {
 	}
 	
 	@Bean
-	public ReactorClientHttpConnector reactorClientHttpConnector() {
-//	    return new ReactorClientHttpConnector(httpClient());
-		
+	@Profile(value = "httpclientthreads")
+	public ReactorClientHttpConnector reactorClientHttpConnector2() {		
 		 Function<HttpClient, HttpClient> mapper = client -> {
 		        // Further customizations...
 			 client.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
@@ -55,21 +62,20 @@ public class HttpClientConfig {
 		return new ReactorClientHttpConnector(resourceFactory(), mapper);
 	}
 	
-	
 	@Bean
-	public WebClient webClient() {
+	public WebClient webClient(ReactorClientHttpConnector reactorClientHttpConnector ) {
 	    return WebClient.builder()
-	    		.clientConnector(reactorClientHttpConnector())
+	    		.clientConnector(reactorClientHttpConnector)
 	    		.build(); 
 	}
 	
 	@Bean
-	public HttpResource httpResource() {
-		return new HttpResource(webClient());
+	public HttpResource httpResource(WebClient webClient) {
+		return new HttpResource(webClient);
 	}
 	
 	@Bean
-	public PkixURIResolver pkixURIResolver() {
-		return new PkixURIResolver(httpResource());
+	public PkixURIResolver pkixURIResolver(HttpResource httpResource) {
+		return new PkixURIResolver(httpResource);
 	}
 }
