@@ -24,10 +24,10 @@ public class HttpClientConfig {
 	public HttpClient httpClient() {
 		HttpClient httpClient = HttpClient.create()
 		        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
-		        .responseTimeout(Duration.ofSeconds(10))
+		        .responseTimeout(Duration.ofSeconds(30))
 		        .doOnConnected(conn -> conn
-		                .addHandlerLast(new ReadTimeoutHandler(10))
-		                .addHandlerLast(new WriteTimeoutHandler(10)));
+		                .addHandlerLast(new ReadTimeoutHandler(30))
+		                .addHandlerLast(new WriteTimeoutHandler(30)));
 		
 		return httpClient;
 	}
@@ -52,10 +52,10 @@ public class HttpClientConfig {
 		 Function<HttpClient, HttpClient> mapper = client -> {
 		        // Further customizations...
 			 client.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
-		        .responseTimeout(Duration.ofSeconds(10))
+		        .responseTimeout(Duration.ofSeconds(30))
 		        .doOnConnected(conn -> conn
-		                .addHandlerLast(new ReadTimeoutHandler(10))
-		                .addHandlerLast(new WriteTimeoutHandler(10)));
+		                .addHandlerLast(new ReadTimeoutHandler(30))
+		                .addHandlerLast(new WriteTimeoutHandler(30)));
 			 return client;
 		    };
 		
